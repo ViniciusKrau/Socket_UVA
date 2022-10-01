@@ -38,12 +38,12 @@ void main(){
         int len_client = sizeof(client);
         SOCKET sock = accept(listening, (struct sockaddr*)&client, &len_client); //Aceita conexão de cliente e cria um socket de comunicação
         if (sock == INVALID_SOCKET){
-            printf("Erro na criacao do socket de conexão: %d" , WSAGetLastError());
+            printf("Erro na criacao do socket de conexao: %d" , WSAGetLastError());
             exit(EXIT_FAILURE);
         }
         unsigned char ip[4];
         memcpy(&ip, &client.sin_addr, 4);
-        printf("Conexão de \"%d.%d.%d.%d\"\n", ip[0],ip[1],ip[2],ip[3]); // Imprime IP do cliente para verificação
+        printf("Conexao de \"%d.%d.%d.%d\"\n", ip[0],ip[1],ip[2],ip[3]); // Imprime IP do cliente para verificação
         
         // Converte instrução recebida para inteiro
         uint32_t filelenU;
