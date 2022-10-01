@@ -5,12 +5,19 @@
 #include <time.h>
 #define PORTA_SERV 25565
 
-#pragma comment(lib,"ws2_32.lib")                       /* Winsock Library */
+#pragma comment(lib,"ws2_32.lib")      
+
+long timediff(clock_t t1, clock_t t2) {
+    long elapsed;
+    elapsed = ((double)t2 - t1) / CLOCKS_PER_SEC * 1000;
+    return elapsed;
+}
+
 
 void main(int argc, char *argv[]){                      //Passar nome ou ip do servidor em prompt de comando
 
     if (argc < 2) {
-        printf("Nome do servidor não informado\nLocalhost será usado\n");
+        printf("Nome do servidor nao informado\nLocalhost sera usado\n");
         argv[1] = "localhost";
     }
     else if (argc > 2){
@@ -56,7 +63,7 @@ void main(int argc, char *argv[]){                      //Passar nome ou ip do s
     }
 
     //Recebe informação enviada pelo servidor
-    clock_t clocks = clock();                          // Marca inicio das transferencias
+    clock_t t1 = clock(), t2;                    // Marca inicio das transferencias
 
     uint32_t filelenU;                                  //Formato de recebimento de int em network byte order
     if(recv(conn, (char*)&filelenU, sizeof(filelenU), 0) < 0){
@@ -74,14 +81,14 @@ void main(int argc, char *argv[]){                      //Passar nome ou ip do s
         n = n + strlen(buffer);                         // Recebe e escreve em buffer
         fprintf(output, buffer);                        // Imprime buffer no arquivo
     }
-    long seconds = (((long)(clock() - (long)clocks))/CLOCKS_PER_SEC);
+    t2 = clock();
+    long elapsed = timediff(t1, t2);
     fseek(output, 0L, SEEK_END);
     long size = ftell(output);
-    printf("%d\n", seconds);
-    if (seconds == 0) printf("\nTaxa de Transferencia = %d mbps\n", (size*8));
-    else printf("\nTaxa de Transferencia = %d mbps\n", (size*8)/seconds); // Calcula e imprime a taxa de transferencia no arquivo
+    if (elapsed == 0) printf("\nTaxa de Transferencia instantanea");
+    else printf("\nTempo decorrido: %ld ms\nTaxa de Transferencia = %d mbps\n", elapsed, (size * 8) / (elapsed * 1000) ); // Calcula e imprime a taxa de transferencia no arquivo
 
     fclose(output);
-    printf("Finalizado\n");
+    printf("\nFinalizado\n");
     system("pause");
 }
