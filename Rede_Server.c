@@ -9,10 +9,10 @@
 
 void main(){
 
-    struct sockaddr_in saddr;  // Informações sobre o socket de recebimento    
-    saddr.sin_family = AF_INET; // Protocolo ipv4
-    saddr.sin_addr.s_addr = INADDR_ANY; //Qualquer IP
-    saddr.sin_port = htons(PORTA_SERV); // Porta 25565
+    struct sockaddr_in saddr;                                           // Informações sobre o socket de recebimento    
+    saddr.sin_family = AF_INET;                                         // Protocolo ipv4
+    saddr.sin_addr.s_addr = INADDR_ANY;                                 //Qualquer IP
+    saddr.sin_port = htons(PORTA_SERV);                                 // Porta 25565
 
     // INICIA O WINSOCK
     WSADATA wsa;
@@ -21,7 +21,7 @@ void main(){
         exit(EXIT_FAILURE);
     }
     // Criar um Socket para receber conexões
-    SOCKET listening; //Socket de Recebimento
+    SOCKET listening;                                                   //Socket de Recebimento
     if ((listening = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("Erro na criacao do socket: %d" , WSAGetLastError());
         exit(EXIT_FAILURE);
@@ -31,7 +31,7 @@ void main(){
         printf("Falha no bind: %d" , WSAGetLastError());
         exit(EXIT_FAILURE);
     }
-    listen(listening, 1); // Define o Socket "listening" como socket de escuta
+    listen(listening, 5);                                               // Define o Socket "listening" como socket de escuta
     printf("Servidor Iniciado\n");
     while(1){
         struct sockaddr_in client;
@@ -49,37 +49,34 @@ void main(){
         uint32_t filelenU;
         int filelen = 0;
         
-        FILE* envio = fopen("envio.txt", "r"); // Abre arquivo para leitura e envio
-        if (envio == NULL){ // Verifica erro ao abrir o arquivo
+        FILE* envio = fopen("envio.txt", "r");                          // Abre arquivo para leitura e envio
+        if (envio == NULL){                                             // Verifica erro ao abrir o arquivo
             perror("Erro ao abrir o arquivo");
             close(sock);
             close(listening);
             exit(EXIT_FAILURE);
         }
 
-        // Essa parte pode ser desnecessaria mas pode pegar bugs não previstos.//
+        // Calcula o tamanho do arquivo em bytes
         if (filelen == 0){
             while (fgetc(envio) != EOF){
                 filelen++;
             }
         }
         rewind(envio);
-        
-        filelenU = htonl(filelen);                          // Converte len de buffer em network order
-        if (send(sock, (char*)&filelenU, sizeof(filelenU), 0) < 0){  // Envia tamanho do arquivo a ser recebido para o cliente
+
+        filelenU = htonl(filelen);                                      // Converte len de buffer em network order
+        if (send(sock, (char*)&filelenU, sizeof(filelenU), 0) < 0){     // Envia tamanho do arquivo a ser recebido para o cliente
             perror("Erro no envio do tamanho");
         }
         else printf("Tamanho enviado\n");
-
         char buffer[1024];
-        // printf("%s\n", buffer);
-        while (fgets(buffer, 1024, envio) != NULL){// envia arquivo linha por linha
-            // printf("%s",buffer);
-            // printf("%s\n", buffer);
+        while (fgets(buffer, 1024, envio) != NULL){                     // envia arquivo linha por linha
             send(sock, buffer, 1024, 0);
         }
         printf("Arquivo Enviado\n\n");
         fclose(envio);
+        close(sock);
     }
 
     exit(EXIT_SUCCESS);

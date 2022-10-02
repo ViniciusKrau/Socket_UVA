@@ -50,7 +50,7 @@ void main(int argc, char *argv[]){                      //Passar nome ou ip do s
         exit(EXIT_FAILURE);
     }
     
-                                                        //copia as informaçoes de endereço encontrado por gethostbyname
+    //copia as informaçoes de endereço encontrado por gethostbyname
     memcpy(&saddr.sin_addr, hp->h_addr, hp->h_length);
     saddr.sin_family = AF_INET;                         //Servidor ipv4
     saddr.sin_port = htons(PORTA_SERV);                 // Porta 25565 definida acima serio possivel passar a porta como argumento junto do Ip do servidor.
@@ -86,7 +86,7 @@ void main(int argc, char *argv[]){                      //Passar nome ou ip do s
     fseek(output, 0L, SEEK_END);
     long size = ftell(output);
     if (elapsed == 0) printf("\nTaxa de Transferencia instantanea");
-    else printf("\nTempo decorrido: %ld ms\nTaxa de Transferencia = %d mbps\n", elapsed, (size * 8) / (elapsed * 1000) ); // Calcula e imprime a taxa de transferencia no arquivo
+    else printf("\nTempo decorrido: %ldms \nTaxa de Transferencia = %f mbps\n", elapsed, ((size * 8) / (elapsed / 1000.0))/1000000 ); // Calcula e imprime a taxa de transferencia no arquivo
 
     fclose(output);
     printf("\nFinalizado\n");
